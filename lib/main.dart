@@ -53,7 +53,31 @@ class _MyHomePageState extends State<MyHomePage> {
       badge: true,
     );
 
-    
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("Message received: ${event.notification?.body}");
+      if(mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(event.notification?.title ?? "No Title"),
+            content: Text(event.notification?.body ?? "No Content"),
+          ),
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print("Notification clicked! ${message.data}");
+      if(mounted) {
+        if (message.data['screen'] != null) {
+          Navigator.pushNamed(context, message.data['screen']);
+        }
+      }
+    });
+
+    messaging.getToken().then((token) {
+      print("FCM Token: $token");
+    });
   }
 
   void _incrementCounter() {
